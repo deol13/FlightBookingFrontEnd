@@ -5,10 +5,15 @@ import './ChatBot.css';
 const ChatBot = () => {
     const [questionValue, setQuestionValue]= useState("");
     const [conversationId, setConversationId] = useState(1);
+    // Chat history state, each message has a sender (user or bot) and text in its own index.
+    // This is so we can easily map through it and display messages in the chat area
+    // with different styles for user and bot messages
     const [chatHistory, setChatHistory] = useState([
         { sender: "bot", text: "Welcome to Flight Booking Assistant. How can I help you?" }
     ]);
+    // Loading spinner state
     const [loading, setLoading] = useState(false)
+    // Ref for the end of chat messages
     const chatEndRef = useRef(null);
 
     useEffect(() => {
@@ -28,7 +33,8 @@ const ChatBot = () => {
             ...prev,
             { sender: "user", text: questionValue }
         ]);
-        setLoading(true);
+        
+        setLoading(true); // Show loading spinner
         console.log("Question sent:", questionValue); 
         sendQuestionToBackend();
     }
@@ -47,7 +53,7 @@ const ChatBot = () => {
             ]);
         }
         // setConversationId(conversationId + 1);
-        setLoading(false);
+        setLoading(false); // Hide loading spinner
         setQuestionValue("");
     }
 
@@ -60,7 +66,7 @@ const ChatBot = () => {
     }
 
     return (
-        <div className="container chat-bot">
+        <div className="container chat-bot col-6">
             <div>
                 <h2 className='text center'>Flight Booking Assistant</h2>
                 <div className='mt-3 ms-1 me-1 row chat-history-area'>
@@ -68,16 +74,21 @@ const ChatBot = () => {
                         {chatHistory.map((msg, idx) => (
                             <div
                                 key={idx}
+                                // Color bot and user's messages differently with the user of CSS classes
                                 className={`chat-message ${msg.sender === "user" ? "user-message" : "bot-message"}`}
                             >
                                 {msg.text}
                             </div>
                         ))}
                         {loading && (
+                            // Show loading spinner when waiting for bot response
                             <div className="chat-message bot-message">
                                 <span className="spinner"></span> Bot is typing...
                             </div>
                         )}
+                        {
+                        //Dummy div to enable auto-scroll to bottom
+                        }
                         <div ref={chatEndRef} />
                     </div>
                 </div>
