@@ -1,13 +1,22 @@
-import React, {useState} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {callAiChatbot} from '../services/backendService';
 import './ChatBot.css';
 
 const ChatBot = () => {
     const [questionValue, setQuestionValue]= useState("");
     const [conversationId, setConversationId] = useState(1);
-     const [chatHistory, setChatHistory] = useState([
+    const [chatHistory, setChatHistory] = useState([
         { sender: "bot", text: "Welcome to Flight Booking Assistant. How can I help you?" }
     ]);
+    const [loading, setLoading] = useState(false)
+    const chatEndRef = useRef(null);
+
+    useEffect(() => {
+        // Scroll to the bottom when chatHistory or loading changes
+        if (chatEndRef.current) {
+            chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [chatHistory, loading]);
 
     const handleQuestionChange = (event) => {
         setQuestionValue(event.target.value);
@@ -19,7 +28,8 @@ const ChatBot = () => {
             ...prev,
             { sender: "user", text: questionValue }
         ]);
-        console.log("Question sent:", questionValue);
+        setLoading(true);
+        console.log("Question sent:", questionValue); 
         sendQuestionToBackend();
     }
 
@@ -37,6 +47,7 @@ const ChatBot = () => {
             ]);
         }
         // setConversationId(conversationId + 1);
+        setLoading(false);
         setQuestionValue("");
     }
 
@@ -62,6 +73,12 @@ const ChatBot = () => {
                                 {msg.text}
                             </div>
                         ))}
+                        {loading && (
+                            <div className="chat-message bot-message">
+                                <span className="spinner"></span> Bot is typing...
+                            </div>
+                        )}
+                        <div ref={chatEndRef} />
                     </div>
                 </div>
                 <div className='mb-2 ms-1 me-1 row'>
