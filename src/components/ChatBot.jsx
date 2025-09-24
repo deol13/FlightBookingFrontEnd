@@ -1,57 +1,84 @@
 import React, {useState} from 'react';
 import {callAiChatbot} from '../services/backendService';
+import './ChatBot.css';
 
 const ChatBot = () => {
     const [questionValue, setQuestionValue]= useState("");
     const [conversationId, setConversationId] = useState(1);
-    const [chatHistory, setChatHistory] = useState("Welcome to Flight Booking Assistant. How can I help you?");
+     const [chatHistory, setChatHistory] = useState([
+        { sender: "bot", text: "Welcome to Flight Booking Assistant. How can I help you?" }
+    ]);
 
     const handleQuestionChange = (event) => {
         setQuestionValue(event.target.value);
     };
 
     const handleSendClick = () => {
-        // Logic to send the question to the backend or process it
+        if (!questionValue.trim()) return;
+        setChatHistory(prev => [
+            ...prev,
+            { sender: "user", text: questionValue }
+        ]);
         console.log("Question sent:", questionValue);
         sendQuestionToBackend();
     }
 
     const sendQuestionToBackend = async () => {
-        let response = "";
-        
         try {
-            response = await callAiChatbot(questionValue, conversationId);
-            console.log("Response from backend:", response);
-            setChatHistory(chatHistory + "\nUser: " + questionValue + "\nBot: " + response);
+            const response = await callAiChatbot(questionValue, conversationId);
+            setChatHistory(prev => [
+                ...prev,
+                { sender: "bot", text: response }
+            ]);
+        } catch (error) {
+            setChatHistory(prev => [
+                ...prev,
+                { sender: "bot", text: "Sorry, there was an error processing your request." }
+            ]);
         }
-        catch (error) {
-            response = "Sorry, there was an error processing your request.";
-            setChatHistory(response);
-        }
-       // setConversationId(conversationId + 1);
-       setQuestionValue("");
+        // setConversationId(conversationId + 1);
+        setQuestionValue("");
     }
 
      const resetChat = () => {
         setQuestionValue("");
         setConversationId(conversationId + 1);
-        setChatHistory("Welcome to Flight Booking Assistant. How can I help you?");
+        setChatHistory([
+            { sender: "bot", text: "Welcome to Flight Booking Assistant. How can I help you?" }
+        ]);
     }
 
     return (
         <div className="container chat-bot">
-            <div className=''>
-                <h2>Flight Booking Assistant</h2>
-                <div className='mt-4 row'>
-                    <label>Chat History:</label>
-                    <textarea rows="10" value={chatHistory} readOnly />
+            <div>
+                <h2 className='text center'>Flight Booking Assistant</h2>
+                <div className='mt-3 ms-1 me-1 row chat-history-area'>
+                    <div className="chat-messages">
+                        {chatHistory.map((msg, idx) => (
+                            <div
+                                key={idx}
+                                className={`chat-message ${msg.sender === "user" ? "user-message" : "bot-message"}`}
+                            >
+                                {msg.text}
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                <div className='row'>
-                    <label>Your Message:</label>
-                    <textarea value={questionValue} rows="2" onChange={handleQuestionChange} placeholder="Type your message here..." />
+                <div className='mb-2 ms-1 me-1 row'>
+                    <label className="form-label">Your Message:</label>
+                    <textarea 
+                        className="user-message-area"
+                        value={questionValue} 
+                        rows="2" 
+                        onChange={handleQuestionChange} 
+                        placeholder="Type your message here..." 
+                    />
                 </div>
-                <button className='mt-2 btn btn-primary' onClick={() => handleSendClick()}>Send</button>
-                <button className='ms-2 mt-2 btn btn-primary' onClick={() => resetChat()}>Reset</button>
+                <div className="d-flex justify-content-start ms-1">
+                    <button className='btn btn-primary' onClick={() => handleSendClick()}>Send</button>
+                    <button className='ms-2 btn btn-secondary' onClick={() => resetChat()}>Reset</button>
+                </div>
+                
             </div>
             
         </div>
