@@ -2,7 +2,7 @@ import React, {useState, useRef, useEffect} from 'react';
 import {callAiChatbot} from '../services/backendService';
 import './ChatBot.css';
 
-const ChatBot = () => {
+const ChatBot = ({ refreshFlights }) => {
     const [questionValue, setQuestionValue]= useState("");
     const [conversationId, setConversationId] = useState(1);
     // Chat history state, each message has a sender (user or bot) and text in its own index.
@@ -46,6 +46,7 @@ const ChatBot = () => {
                 ...prev,
                 { sender: "bot", text: response }
             ]);
+            checkIfBookingConfirmed(response);
         } catch (error) {
             setChatHistory(prev => [
                 ...prev,
@@ -57,7 +58,27 @@ const ChatBot = () => {
         setQuestionValue("");
     }
 
-     const resetChat = () => {
+    const checkIfBookingConfirmed = (response) => {
+        // Check the latest bot message for booking confirmation
+        try {
+             if (response.length === 0) return false;
+        if(response.toLowerCase().includes("booking confirmed")) {
+            console.log("Booking confirmed, refreshing flight list...");
+            if (refreshFlights) refreshFlights();
+        }  
+        else if(response.toLowerCase().includes("successfully booked")) {
+            console.log("Booking confirmed, refreshing flight list...");
+            if (refreshFlights) refreshFlights();
+        }
+        console.log("No booking confirmation found in bot response.");
+        } catch (error) {
+            console.error("Error checking booking confirmation:", error);
+        }
+       
+        return false;
+    }
+
+    const resetChat = () => {
         setQuestionValue("");
         setConversationId(conversationId + 1);
         setChatHistory([
@@ -66,7 +87,7 @@ const ChatBot = () => {
     }
 
     return (
-        <div className="container chat-bot col-6">
+        <div className="container chat-bot">
             <div>
                 <h2 className='text center'>Flight Booking Assistant</h2>
                 <div className='mt-3 ms-1 me-1 row chat-history-area'>

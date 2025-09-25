@@ -21,3 +21,16 @@ export async function callAiChatbot(question, conversationId) {
         throw error;
     }
 }
+
+export async function getAllAvailableFlights() {
+    console.log(`### Starting to get all available flights...`);
+
+    try {
+        const response = await axios.get("http://localhost:8080/api/flights/available");
+        console.log("Response from getAllAvailableFlights successful.", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error calling getAllAvailableFlights:", error);
+        throw error;
+    }
+}

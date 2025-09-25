@@ -1,11 +1,22 @@
+.chat-bot {
+    background: #f0f4fa;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 24px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;  /* Center vertically */
+    align-items: center;      /* Center horizontally */
+}
+
 .chat-history-area {
     background: #fff;
     border: 1px solid #dee2e6;
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 16px;
-    min-height: 220px;
-    max-height: 320px;
+    min-height: 400px;   /* Increased from 220px */
+    max-height: 600px;   /* Increased from 320px */
     overflow-y: auto;
 }
 
@@ -53,9 +64,3 @@
 }
 
 
-.chat-bot {
-    background: #f0f4fa;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    padding: 32px 24px;
-}
